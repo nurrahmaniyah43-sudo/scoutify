@@ -1,0 +1,1225 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Scoutify - Aplikasi Kepramukaan Interaktif</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        scout: {
+                            cream: '#FDF6E3',
+                            creamDark: '#F4E8C1',
+                            brownLight: '#A06D3B',
+                            brown: '#5D3A1A',
+                            brownDark: '#3A200B',
+                            gold: '#D4A373',
+                            scarlet: '#BC2C1A',
+                            forest: '#2D5A27'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Poppins', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace']
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+            background-color: #1a0f07;
+        }
+
+        .glass-panel {
+            background: rgba(61, 35, 20, 0.75);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(212, 163, 115, 0.3);
+        }
+        
+        .glass-card-light {
+            background: rgba(253, 246, 227, 0.92);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(93, 58, 26, 0.25);
+        }
+
+        @keyframes signalBlink {
+            0%, 100% { opacity: 0.2; transform: scale(0.98); }
+            50% { opacity: 1; background-color: #FBBF24; box-shadow: 0 0 35px #FBBF24; transform: scale(1.02); }
+        }
+        .blinking {
+            animation: signalBlink 0.35s infinite;
+        }
+
+        ::-webkit-scrollbar {
+            width: 5px;
+            height: 5px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.2);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #A06D3B;
+            border-radius: 4px;
+        }
+        
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        .page-turn {
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-0 sm:p-4 text-slate-800">
+
+    <div class="w-full max-w-md bg-scout-brownDark sm:rounded-[38px] shadow-2xl sm:border-[8px] sm:border-scout-brown flex flex-col min-h-screen sm:min-h-[840px] sm:max-h-[870px] overflow-hidden relative border-amber-900/40">
+
+        <div class="relative flex-1 overflow-hidden w-full h-full">
+
+            <!-- SCREEN 1: SPLASH & LANDING -->
+            <div id="screen-1" class="screen-view absolute inset-0 flex flex-col justify-between p-6 transition-all duration-500 opacity-100 z-20">
+                <div class="absolute inset-0 bg-cover bg-center z-0" style="background-image: url('https://images.unsplash.com/photo-1517164850305-99a3e65bb47e?q=80&w=1000&auto=format&fit=crop');"></div>
+                <div class="absolute inset-0 bg-gradient-to-b from-scout-brownDark/85 via-scout-brown/90 to-black/95 z-0"></div>
+
+                <div class="relative z-10 text-center pt-8">
+                    <div class="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-gradient-to-tr from-amber-600 via-scout-gold to-yellow-300 p-1 shadow-2xl shadow-amber-950/80 mb-3 transform hover:rotate-6 transition-transform">
+                        <div class="w-full h-full bg-scout-brownDark rounded-xl flex items-center justify-center border border-amber-400/40">
+                            <i class="fa-solid fa-fleur-de-lis text-4xl text-amber-400"></i>
+                        </div>
+                    </div>
+                    <h1 class="text-4xl font-black tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-yellow-200 via-amber-300 to-amber-100 drop-shadow-lg">
+                        Scoutify
+                    </h1>
+                    <p class="text-[11px] font-semibold text-amber-200/80 tracking-widest uppercase mt-1">Panduan & Penerjemah Kepramukaan</p>
+                </div>
+
+                <div class="relative z-10 my-auto text-center px-2 space-y-5">
+                    <button onclick="startApp()" class="group relative w-full py-4 px-8 rounded-2xl bg-gradient-to-r from-amber-500 via-yellow-500 to-amber-600 text-scout-brownDark font-extrabold text-lg shadow-xl shadow-amber-900/50 hover:brightness-110 active:scale-95 transition-all duration-200 flex items-center justify-center space-x-3 border border-yellow-200/50">
+                        <i class="fa-solid fa-play text-xl group-hover:scale-110 transition-transform"></i>
+                        <span>START</span>
+                    </button>
+
+                    <div class="glass-panel p-4 rounded-2xl border border-amber-500/30 text-amber-100 shadow-xl">
+                        <div class="flex justify-center space-x-3 text-amber-400 text-lg mb-2">
+                            <i class="fa-solid fa-campground"></i>
+                            <i class="fa-solid fa-compass"></i>
+                            <i class="fa-solid fa-book-bookmark"></i>
+                        </div>
+                        <p class="text-xs text-amber-100/90 leading-relaxed font-light">
+                            <strong>Scoutify</strong> adalah aplikasi interaktif kepramukaan modern yang dilengkapi dengan fitur penerjemah sandi otomatis, sinyal suara & cahaya, visualisasi interaktif, serta Buku SKU Digital.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="relative z-10 flex items-center justify-between pt-4 border-t border-amber-500/20">
+                    <button onclick="openModal('infoModal')" class="flex items-center space-x-2 px-4 py-2.5 rounded-xl bg-scout-brownDark/80 hover:bg-amber-900/60 text-amber-300 border border-amber-700/50 text-xs font-bold backdrop-blur-md transition-colors active:scale-95">
+                        <i class="fa-solid fa-circle-info text-amber-400 text-sm"></i>
+                        <span>Info</span>
+                    </button>
+
+                    <button onclick="openModal('kamusModal')" class="flex items-center space-x-2 px-4 py-2.5 rounded-xl bg-amber-600 hover:bg-amber-500 text-scout-brownDark font-extrabold text-xs shadow-lg transition-colors active:scale-95">
+                        <i class="fa-solid fa-book-atlas text-sm"></i>
+                        <span>Kamus</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- SCREEN 2: SELECT MENU -->
+            <div id="screen-2" class="screen-view absolute inset-0 flex flex-col justify-between p-6 transition-all duration-500 opacity-0 pointer-events-none z-10 bg-scout-cream">
+                <div class="absolute inset-0 bg-gradient-to-b from-scout-brownDark via-scout-brown/95 to-scout-cream z-0 pointer-events-none"></div>
+
+                <div class="relative z-10 space-y-6">
+                    <div class="text-center pt-4">
+                        <div class="flex items-center justify-between mb-3 text-left">
+                            <div class="flex items-center space-x-2 text-amber-100"><i class="fa-solid fa-circle-user text-2xl text-amber-400"></i><div class="leading-tight"><p id="chipName" class="text-xs font-bold"></p><p id="chipRole" class="text-[10px] text-amber-300"></p></div></div>
+                            <button onclick="logout()" class="px-2.5 py-1.5 rounded-lg bg-scout-scarlet text-white text-[10px] font-bold"><i class="fa-solid fa-right-from-bracket"></i> Keluar</button>
+                        </div>
+                        <span class="px-3 py-1 bg-amber-500/20 text-amber-300 rounded-full text-[10px] font-bold tracking-widest uppercase border border-amber-500/30">Menu Utama</span>
+                        <h2 class="text-3xl font-black text-amber-100 tracking-wide mt-1 drop-shadow">Select Menu</h2>
+                        <p class="text-xs text-amber-200/80">Pilih modul materi yang ingin dipelajari</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 gap-4 pt-2">
+                        <div id="box-sandi" onclick="selectMenuOption('sandi')" class="menu-box cursor-pointer p-5 rounded-2xl bg-gradient-to-br from-scout-creamDark to-white border-2 border-amber-600 shadow-xl transition-all duration-200 transform hover:-translate-y-1 relative overflow-hidden">
+                            <div class="flex items-center space-x-4">
+                                <div class="w-14 h-14 rounded-2xl bg-scout-brown text-amber-400 flex items-center justify-center text-2xl shadow-md shrink-0">
+                                    <i class="fa-solid fa-code"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <div class="flex items-center justify-between">
+                                        <h3 class="text-lg font-extrabold text-scout-brownDark">Sandi Pramuka</h3>
+                                        <span id="badge-sandi" class="w-6 h-6 rounded-full bg-amber-500 text-scout-brownDark flex items-center justify-center text-xs font-bold shadow">
+                                            <i class="fa-solid fa-check"></i>
+                                        </span>
+                                    </div>
+                                    <p class="text-xs text-scout-brownLight mt-1 font-medium leading-snug">Penerjemah Morse, Kotak I/II, Rumput, Semaphore & Suara Sinyal</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="box-sku" onclick="selectMenuOption('sku')" class="menu-box cursor-pointer p-5 rounded-2xl bg-gradient-to-br from-scout-creamDark to-white border-2 border-amber-900/20 shadow-xl transition-all duration-200 transform hover:-translate-y-1 relative overflow-hidden opacity-75">
+                            <div class="flex items-center space-x-4">
+                                <div class="w-14 h-14 rounded-2xl bg-scout-scarlet text-yellow-300 flex items-center justify-center text-2xl shadow-md shrink-0">
+                                    <i class="fa-solid fa-book-open"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <div class="flex items-center justify-between">
+                                        <h3 class="text-lg font-extrabold text-scout-brownDark">Buku SKU</h3>
+                                        <span id="badge-sku" class="w-6 h-6 rounded-full bg-slate-300 text-slate-600 flex items-center justify-center text-xs font-bold shadow opacity-0">
+                                            <i class="fa-solid fa-check"></i>
+                                        </span>
+                                    </div>
+                                    <p class="text-xs text-scout-brownLight mt-1 font-medium leading-snug">Buku Syarat Kecakapan Umum Digital interaktif</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="box-dash" onclick="selectMenuOption('dash')" class="menu-box cursor-pointer p-5 rounded-2xl bg-gradient-to-br from-scout-creamDark to-white border-2 border-amber-900/20 shadow-xl transition-all duration-200 transform hover:-translate-y-1 relative overflow-hidden opacity-75">
+                            <div class="flex items-center space-x-4">
+                                <div class="w-14 h-14 rounded-2xl bg-scout-forest text-amber-200 flex items-center justify-center text-2xl shadow-md shrink-0"><i class="fa-solid fa-user-shield"></i></div>
+                                <div class="flex-1">
+                                    <div class="flex items-center justify-between">
+                                        <h3 id="dashTitle" class="text-lg font-extrabold text-scout-brownDark">Dashboard</h3>
+                                        <span id="badge-dash" class="w-6 h-6 rounded-full bg-amber-500 text-scout-brownDark flex items-center justify-center text-xs font-bold shadow opacity-0"><i class="fa-solid fa-check"></i></span>
+                                    </div>
+                                    <p id="dashDesc" class="text-xs text-scout-brownLight mt-1 font-medium leading-snug"></p>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="relative z-10 bg-scout-brownDark/90 p-3 rounded-xl border border-amber-500/20 text-center text-amber-200 text-xs flex items-center justify-center space-x-2">
+                    <i class="fa-solid fa-circle-info text-amber-400 text-sm"></i>
+                    <span>Klik pilihan kotak di atas, lalu tekan tombol <strong>Next</strong>.</span>
+                </div>
+
+                <div class="relative z-10 pt-2">
+                    <button onclick="handleMenuNext()" class="w-full py-4 rounded-2xl bg-gradient-to-r from-amber-500 via-amber-600 to-scout-brown text-amber-100 font-extrabold text-base shadow-xl hover:brightness-110 active:scale-95 transition-all flex items-center justify-center space-x-2 border border-amber-400/40">
+                        <span>NEXT</span>
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- SCREEN 3: PENERJEMAH (CIPHER TRANSLATOR) -->
+            <div id="screen-3" class="screen-view absolute inset-0 flex flex-col justify-between p-4 transition-all duration-500 opacity-0 pointer-events-none z-10 bg-scout-cream overflow-y-auto no-scrollbar">
+                <div class="fixed inset-0 bg-gradient-to-b from-scout-brownDark via-scout-brown/95 to-scout-cream z-0 pointer-events-none"></div>
+
+                <div class="relative z-10 space-y-3 pb-20">
+                    <div class="flex items-center justify-between pt-2">
+                        <div>
+                            <h2 class="text-2xl font-black text-amber-100 tracking-wide drop-shadow">Penerjemah</h2>
+                            <p class="text-[10px] text-amber-200/80">Konversi kata & kalimat ke Sandi Pramuka</p>
+                        </div>
+
+                        <div class="relative">
+                            <select id="cipherTypeSelect" onchange="translateText()" class="bg-scout-brownDark text-amber-300 text-xs font-bold px-3 py-2 rounded-xl border border-amber-500/50 focus:outline-none focus:ring-2 focus:ring-amber-400 shadow">
+                                <option value="morse">Sandi Morse</option>
+                                <option value="kotak1">Sandi Kotak I</option>
+                                <option value="kotak2">Sandi Kotak II</option>
+                                <option value="rumput">Sandi Rumput</option>
+                                <option value="semaphore">Semaphore</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="bg-scout-brownDark/95 p-3 rounded-2xl border border-amber-600/40 shadow-lg flex items-center justify-between text-amber-100">
+                        <div class="flex items-center space-x-2 text-xs font-bold">
+                            <span id="modeLabelLeft" class="px-2.5 py-1 rounded-lg bg-amber-500 text-scout-brownDark font-extrabold">Teks</span>
+                            <i id="directionIcon" class="fa-solid fa-chevron-right text-amber-400 text-sm"></i>
+                            <span id="modeLabelRight" class="px-2.5 py-1 rounded-lg bg-scout-brown border border-amber-700 text-amber-200">Sandi</span>
+                        </div>
+                        <button onclick="toggleTranslateDirection()" class="px-3 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-scout-brownDark font-extrabold text-xs shadow transition-transform active:scale-90 flex items-center space-x-1.5">
+                            <i class="fa-solid fa-repeat"></i>
+                            <span>Balik Arah</span>
+                        </button>
+                    </div>
+
+                    <div class="glass-card-light rounded-2xl p-3 shadow-md space-y-1.5">
+                        <div class="flex items-center justify-between">
+                            <label id="inputBoxHeading" class="text-xs font-bold text-scout-brownDark flex items-center space-x-1.5">
+                                <i class="fa-solid fa-pen-to-square text-amber-700"></i>
+                                <span>Masukkan Teks</span>
+                            </label>
+                            <button onclick="clearTranslatorInput()" class="text-[10px] text-scout-scarlet hover:underline font-bold">Clear</button>
+                        </div>
+                        <textarea id="translatorInput" oninput="translateText()" rows="2" class="w-full bg-white/95 border border-amber-900/20 rounded-xl p-2.5 text-xs font-mono font-bold text-scout-brownDark placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-600" placeholder="Ketik kata di sini (Contoh: PRAMUKA)..."></textarea>
+                    </div>
+
+                    <div class="glass-card-light rounded-2xl p-3 shadow-md space-y-1.5">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-bold text-scout-brownDark flex items-center space-x-1.5">
+                                <i class="fa-solid fa-square-poll-vertical text-scout-forest"></i>
+                                <span>Hasil Terjemah</span>
+                            </span>
+                            <button onclick="copyTranslationResult()" class="px-2.5 py-1 rounded-lg bg-scout-brown text-amber-300 text-[10px] font-bold hover:bg-scout-brownDark flex items-center space-x-1 active:scale-95 shadow">
+                                <i class="fa-solid fa-copy"></i>
+                                <span>Salin</span>
+                            </button>
+                        </div>
+                        <div id="translatorOutput" class="w-full bg-scout-brownDark rounded-xl p-3 text-sm font-mono font-bold text-amber-400 min-h-[55px] break-words shadow-inner">
+                            .--. .-. .- -- ..- -.- .-
+                        </div>
+                    </div>
+
+                    <div class="bg-scout-brownDark/90 p-3 rounded-2xl border border-amber-600/40 shadow-lg space-y-2">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-extrabold text-amber-300 flex items-center space-x-1.5">
+                                <i class="fa-solid fa-tower-broadcast text-amber-400"></i>
+                                <span>Suara dan Sinyal</span>
+                            </span>
+                            <span class="text-[9px] bg-amber-500/20 text-amber-300 px-2 py-0.5 rounded border border-amber-500/30">Audio & Sinyal</span>
+                        </div>
+
+                        <div class="grid grid-cols-3 gap-2 pt-1">
+                            <button onclick="playMorseAudioSignal()" class="p-2.5 rounded-xl bg-scout-brown hover:bg-amber-800 border border-amber-600/40 flex flex-col items-center justify-center text-center space-y-1 group active:scale-95 transition-all shadow">
+                                <div class="w-7 h-7 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center text-xs">
+                                    <i class="fa-solid fa-volume-high"></i>
+                                </div>
+                                <span class="text-[10px] font-bold text-amber-100 leading-tight">Suara Morse</span>
+                            </button>
+
+                            <button onclick="triggerFlashSignal()" class="p-2.5 rounded-xl bg-scout-brown hover:bg-amber-800 border border-amber-600/40 flex flex-col items-center justify-center text-center space-y-1 group active:scale-95 transition-all shadow">
+                                <div id="flashIndicator" class="w-7 h-7 rounded-lg bg-yellow-500/20 text-yellow-300 flex items-center justify-center text-xs">
+                                    <i class="fa-solid fa-bolt"></i>
+                                </div>
+                                <span class="text-[10px] font-bold text-amber-100 leading-tight">Sinyal Light</span>
+                            </button>
+
+                            <button onclick="playWhistleAudio()" class="p-2.5 rounded-xl bg-scout-brown hover:bg-amber-800 border border-amber-600/40 flex flex-col items-center justify-center text-center space-y-1 group active:scale-95 transition-all shadow">
+                                <div class="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-xs">
+                                    <i class="fa-solid fa-bullhorn"></i>
+                                </div>
+                                <span class="text-[10px] font-bold text-amber-100 leading-tight">Peluit Audio</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="glass-panel p-3.5 rounded-2xl border border-amber-500/30 text-amber-100 shadow-xl space-y-2.5">
+                        <div class="flex items-center justify-between border-b border-amber-500/20 pb-2">
+                            <span class="text-xs font-bold text-amber-300 flex items-center space-x-1.5">
+                                <i class="fa-solid fa-image text-amber-400"></i>
+                                <span>Visualisasi Bergambar Interaktif</span>
+                            </span>
+                            <span id="visualCipherTag" class="text-[9px] bg-amber-600 text-scout-brownDark font-extrabold px-2 py-0.5 rounded">
+                                SANDI KOTAK I
+                            </span>
+                        </div>
+
+                        <p class="text-[10px] text-amber-200/80">Gambar visual dari teks terjemahan:</p>
+
+                        <div id="visualDrawingContainer" class="bg-black/50 rounded-xl p-3 border border-amber-900/60 min-h-[130px] flex items-center justify-center flex-wrap gap-3 overflow-x-auto no-scrollbar shadow-inner">
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="fixed bottom-0 left-0 right-0 p-3 bg-scout-brownDark/95 border-t border-amber-900/60 flex items-center justify-center z-30">
+                    <button onclick="switchScreen(2)" class="px-10 py-3 rounded-2xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-scout-brownDark font-black text-sm shadow-xl flex items-center space-x-2 border border-yellow-200/40 active:scale-95 transition-all">
+                        <i class="fa-solid fa-house"></i>
+                        <span>MENU</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- SCREEN 4: BUKU SKU DIGITAL -->
+            <div id="screen-4" class="screen-view absolute inset-0 flex flex-col justify-between p-4 transition-all duration-500 opacity-0 pointer-events-none z-10">
+                <div class="absolute inset-0 bg-cover bg-center opacity-30 z-0" style="background-image: url('https://images.unsplash.com/photo-1526778548025-fa2f459cd5c1?q=80&w=1000&auto=format&fit=crop');"></div>
+                <div class="absolute inset-0 bg-gradient-to-b from-scout-brownDark via-scout-brown/95 to-scout-brownDark z-0"></div>
+
+                <div class="relative z-10 space-y-4 pb-20">
+                    <div class="text-center pt-2">
+                        <span class="px-3 py-1 bg-amber-500/20 text-amber-300 rounded-full text-[10px] font-bold uppercase border border-amber-500/30">Materi Kepramukaan</span>
+                        <h2 class="text-2xl font-black text-amber-100 tracking-wide mt-1 drop-shadow">Buku SKU Digital</h2>
+                        <p class="text-xs text-amber-200/80">Syarat Kecakapan Umum Gerakan Pramuka</p>
+                    </div>
+
+                    <div class="flex flex-col items-center justify-center my-auto pt-2">
+                        <div id="skuDigitalBook" class="page-turn w-full max-w-[320px] min-h-[360px] rounded-2xl bg-scout-cream shadow-2xl border-4 border-amber-800 p-4 text-scout-brownDark flex flex-col justify-between relative overflow-hidden">
+                            
+                            <div class="flex items-center justify-between border-b-2 border-scout-brown/20 pb-2">
+                                <div class="flex items-center space-x-1.5 font-black text-xs text-scout-brown">
+                                    <i class="fa-solid fa-book-bookmark text-scout-scarlet"></i>
+                                    <span>SKU PENGGALANG</span>
+                                </div>
+                                <span id="skuPageBadge" class="text-[10px] font-bold bg-amber-200 text-scout-brownDark px-2 py-0.5 rounded-full border border-amber-400">Halaman 1 / 3</span>
+                            </div>
+
+                            <div id="skuBookContent" class="my-auto space-y-3 text-xs leading-relaxed py-2">
+                            </div>
+
+                            <div class="flex items-center justify-between border-t border-scout-brown/20 pt-2.5">
+                                <button onclick="changeSkuPage(-1)" class="px-3.5 py-1.5 rounded-xl bg-scout-brown text-amber-200 text-xs font-bold hover:bg-scout-brownDark active:scale-95 transition-all flex items-center space-x-1">
+                                    <i class="fa-solid fa-chevron-left"></i>
+                                    <span>Prev</span>
+                                </button>
+
+                                <span class="text-[10px] font-bold text-scout-brownLight italic">Buku SKU Interaktif</span>
+
+                                <button onclick="changeSkuPage(1)" class="px-3.5 py-1.5 rounded-xl bg-amber-600 text-scout-brownDark text-xs font-bold hover:bg-amber-500 active:scale-95 transition-all flex items-center space-x-1 shadow">
+                                    <span>Next</span>
+                                    <i class="fa-solid fa-chevron-right"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="fixed bottom-0 left-0 right-0 p-3 bg-scout-brownDark/95 border-t border-amber-900/60 flex items-center justify-center z-30">
+                    <button onclick="switchScreen(2)" class="px-10 py-3 rounded-2xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-scout-brownDark font-black text-sm shadow-xl flex items-center space-x-2 border border-yellow-200/40 active:scale-95 transition-all">
+                        <i class="fa-solid fa-house"></i>
+                        <span>MENU</span>
+                    </button>
+                </div>
+            </div>
+            <!-- SCREEN 5: LOGIN -->
+            <div id="screen-5" class="screen-view absolute inset-0 flex flex-col justify-center p-6 transition-all duration-500 opacity-0 pointer-events-none z-10 bg-scout-brownDark">
+                <div class="absolute inset-0 bg-gradient-to-b from-scout-brownDark via-scout-brown/95 to-scout-brownDark pointer-events-none"></div>
+                <div class="relative z-10 space-y-4">
+                    <div class="text-center">
+                        <div class="inline-flex w-16 h-16 rounded-2xl bg-scout-brownDark border border-amber-400/40 items-center justify-center mb-2"><i class="fa-solid fa-user-lock text-3xl text-amber-400"></i></div>
+                        <h2 class="text-3xl font-black text-amber-100">Login</h2>
+                        <p class="text-xs text-amber-200/80">Masuk sebagai Siswa, Pendamping, atau Admin</p>
+                    </div>
+                    <div class="glass-card-light rounded-2xl p-4 space-y-3 shadow-xl">
+                        <div>
+                            <label class="text-[11px] font-bold text-scout-brownDark">Username</label>
+                            <input id="loginUser" autocapitalize="none" class="w-full mt-1 bg-white border border-amber-900/20 rounded-xl p-2.5 text-xs font-bold text-scout-brownDark focus:outline-none focus:ring-2 focus:ring-amber-600" placeholder="username">
+                        </div>
+                        <div>
+                            <label class="text-[11px] font-bold text-scout-brownDark">Password</label>
+                            <input id="loginPass" type="password" class="w-full mt-1 bg-white border border-amber-900/20 rounded-xl p-2.5 text-xs font-bold text-scout-brownDark focus:outline-none focus:ring-2 focus:ring-amber-600" placeholder="password" onkeydown="if(event.key==='Enter')doLogin()">
+                        </div>
+                        <p id="loginError" class="hidden text-[11px] font-bold text-scout-scarlet"></p>
+                        <button id="loginBtn" onclick="doLogin()" class="w-full py-3 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 text-scout-brownDark font-extrabold text-sm shadow active:scale-95 transition-all"><i class="fa-solid fa-right-to-bracket mr-1"></i> MASUK</button>
+                    </div>
+                    <div class="glass-panel rounded-2xl p-3 text-[10px] text-amber-100/90 font-mono space-y-0.5">
+                        <p class="font-bold text-amber-300 font-sans">Akun awal (dari setup() di Code.gs):</p>
+                        <p>admin / admin123 &middot; kakak1 / kakak123 &middot; siswa1 / siswa123</p>
+                        <p class="font-sans text-amber-200/70">Segera ganti password lewat menu Admin.</p>
+                    </div>
+                    <button onclick="switchScreen(1)" class="w-full text-xs text-amber-300 font-bold hover:underline">&larr; Kembali</button>
+                </div>
+            </div>
+
+            <!-- SCREEN 6: DASHBOARD -->
+            <div id="screen-6" class="screen-view absolute inset-0 flex flex-col p-4 transition-all duration-500 opacity-0 pointer-events-none z-10 bg-scout-brownDark overflow-y-auto no-scrollbar">
+                <div class="fixed inset-0 bg-gradient-to-b from-scout-brownDark via-scout-brown/95 to-scout-brownDark pointer-events-none"></div>
+                <div id="dashContent" class="relative z-10 space-y-3 pb-24 pt-2"></div>
+                <div class="fixed bottom-0 left-0 right-0 p-3 bg-scout-brownDark/95 border-t border-amber-900/60 flex items-center justify-center z-30">
+                    <button onclick="switchScreen(2)" class="px-10 py-3 rounded-2xl bg-gradient-to-r from-amber-500 to-amber-600 text-scout-brownDark font-black text-sm shadow-xl flex items-center space-x-2 active:scale-95 transition-all"><i class="fa-solid fa-house"></i><span>MENU</span></button>
+                </div>
+            </div>
+
+
+        </div>
+    </div>
+
+    <!-- MODALS -->
+    <div id="infoModal" class="fixed inset-0 z-50 hidden bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="glass-panel bg-scout-brownDark rounded-3xl border border-amber-500/40 max-w-xs w-full p-5 shadow-2xl space-y-4 text-amber-100">
+            <div class="flex items-center justify-between border-b border-amber-500/30 pb-3">
+                <div class="flex items-center space-x-2">
+                    <i class="fa-solid fa-circle-info text-amber-400 text-lg"></i>
+                    <h3 class="text-base font-bold">Tentang Scoutify</h3>
+                </div>
+                <button onclick="closeModal('infoModal')" class="text-amber-400 hover:text-white">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+            <div class="text-xs space-y-2 leading-relaxed text-amber-100/90">
+                <p><strong>Scoutify v2.7</strong> adalah aplikasi interaktif kepramukaan untuk mempermudah anggota Pramuka mempelajari sandi, sinyal, dan SKU secara praktis.</p>
+                <div class="bg-black/30 p-2.5 rounded-xl border border-amber-800/40 text-[11px] font-mono space-y-1 text-amber-300">
+                    <p>• Multi-Screen Interactive Flow</p>
+                    <p>• Penerjemah Sandi Pramuka Lengkap</p>
+                    <p>• Gambar Visualisasi Interaktif</p>
+                    <p>• Buku SKU Digital Penggalang</p>
+                </div>
+            </div>
+            <button onclick="closeModal('infoModal')" class="w-full py-2.5 rounded-xl bg-amber-500 text-scout-brownDark font-extrabold text-xs">Tutup</button>
+        </div>
+    </div>
+
+    <div id="kamusModal" class="fixed inset-0 z-50 hidden bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="glass-panel bg-scout-brownDark rounded-3xl border border-amber-500/40 max-w-sm w-full p-5 shadow-2xl space-y-3 text-amber-100 max-h-[80vh] flex flex-col">
+            <div class="flex items-center justify-between border-b border-amber-500/30 pb-2">
+                <div class="flex items-center space-x-2">
+                    <i class="fa-solid fa-book-atlas text-amber-400 text-lg"></i>
+                    <h3 class="text-base font-bold">Kamus Sandi Pramuka</h3>
+                </div>
+                <button onclick="closeModal('kamusModal')" class="text-amber-400 hover:text-white">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+            <div class="flex-1 overflow-y-auto space-y-2 text-xs pr-1">
+                <div class="bg-black/40 p-2.5 rounded-xl border border-amber-800/40">
+                    <h4 class="font-bold text-amber-400">1. Sandi Morse</h4>
+                    <p class="text-[11px] text-amber-200/80 mt-0.5">Sistem isyarat menggunakan titik (.) dan garis (-) yang dapat disampaikan lewat suara peluit atau senter.</p>
+                </div>
+                <div class="bg-black/40 p-2.5 rounded-xl border border-amber-800/40">
+                    <h4 class="font-bold text-amber-400">2. Sandi Kotak I & II</h4>
+                    <p class="text-[11px] text-amber-200/80 mt-0.5">Sandi berbasis garis kotak horizontal, vertikal, dan silang dengan kombinasi titik penanda.</p>
+                </div>
+                <div class="bg-black/40 p-2.5 rounded-xl border border-amber-800/40">
+                    <h4 class="font-bold text-amber-400">3. Sandi Rumput</h4>
+                    <p class="text-[11px] text-amber-200/80 mt-0.5">Sandi yang mengkonversi titik morse menjadi rumput pendek (v) dan garis morse menjadi rumput tinggi (W).</p>
+                </div>
+                <div class="bg-black/40 p-2.5 rounded-xl border border-amber-800/40">
+                    <h4 class="font-bold text-amber-400">4. Semaphore</h4>
+                    <p class="text-[11px] text-amber-200/80 mt-0.5">Penyampaian isyarat menggunakan dua bendera dengan posisi sudut tangan yang berbeda untuk setiap huruf.</p>
+                </div>
+            </div>
+            <button onclick="closeModal('kamusModal')" class="w-full py-2.5 rounded-xl bg-amber-500 text-scout-brownDark font-extrabold text-xs">Tutup Kamus</button>
+        </div>
+    </div>
+
+
+    <div id="userModal" class="fixed inset-0 z-50 hidden bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="glass-panel bg-scout-brownDark rounded-3xl border border-amber-500/40 max-w-xs w-full p-5 shadow-2xl space-y-3 text-amber-100">
+            <h3 id="umTitle" class="text-base font-bold border-b border-amber-500/30 pb-2">Tambah User</h3>
+            <input type="hidden" id="umId">
+            <input id="umName" class="w-full bg-white rounded-xl p-2.5 text-xs font-bold text-scout-brownDark" placeholder="Nama lengkap">
+            <input id="umUser" autocapitalize="none" class="w-full bg-white rounded-xl p-2.5 text-xs font-bold text-scout-brownDark" placeholder="Username">
+            <input id="umPass" class="w-full bg-white rounded-xl p-2.5 text-xs font-bold text-scout-brownDark" placeholder="Password">
+            <select id="umRole" class="w-full bg-white rounded-xl p-2.5 text-xs font-bold text-scout-brownDark">
+                <option value="siswa">Siswa</option>
+                <option value="pendamping">Pendamping / Kakak Dewan</option>
+                <option value="admin">Admin</option>
+            </select>
+            <p id="umError" class="hidden text-[11px] font-bold text-red-300"></p>
+            <div class="flex space-x-2">
+                <button onclick="closeModal('userModal')" class="flex-1 py-2.5 rounded-xl bg-scout-brown border border-amber-700 text-amber-200 font-bold text-xs">Batal</button>
+                <button onclick="saveUser()" class="flex-1 py-2.5 rounded-xl bg-amber-500 text-scout-brownDark font-extrabold text-xs">Simpan</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="customToast" class="fixed top-6 left-1/2 transform -translate-x-1/2 z-50 hidden bg-amber-500 text-scout-brownDark font-extrabold text-xs px-4 py-2.5 rounded-xl shadow-2xl border border-yellow-200 flex items-center space-x-2">
+        <i class="fa-solid fa-circle-check"></i>
+        <span id="toastMessage">Pesan Notifikasi</span>
+    </div>
+
+    <script>
+        // ============================================================
+        //  KONFIGURASI: tempel URL Web App Apps Script (berakhiran /exec)
+        // ============================================================
+        const API_URL = 'https://script.google.com/macros/s/AKfycbwVgslK1xSK2amc7BDIEty-RBG66frcdfzwu-Vy3M3Vy54j0eZWWZjrhBiW_oIn0P4/exec';
+
+        let currentScreen = 1;
+        let selectedMenuOption = 'sandi';
+        let translateDirection = 'encode';
+        let skuPageIndex = 0;
+
+        const MORSE_MAP = {
+            'A': '.-', 'B': '-...', 'C': '-.-.', 'D': '-..', 'E': '.', 'F': '..-.',
+            'G': '--.', 'H': '....', 'I': '..', 'J': '.---', 'K': '-.-', 'L': '.-..',
+            'M': '--', 'N': '-.', 'O': '---', 'P': '.--.', 'Q': '--.-', 'R': '.-.',
+            'S': '...', 'T': '-', 'U': '..-', 'V': '...-', 'W': '.--', 'X': '-..-',
+            'Y': '-.--', 'Z': '--..'
+        };
+        const MORSE_REVERSE = Object.fromEntries(Object.entries(MORSE_MAP).map(([k, v]) => [v, k]));
+
+        const KOTAK1_MAP = {
+            'A': { type: 'grid', cell: 1, dot: false }, 'B': { type: 'grid', cell: 1, dot: true },
+            'C': { type: 'grid', cell: 2, dot: false }, 'D': { type: 'grid', cell: 2, dot: true },
+            'E': { type: 'grid', cell: 3, dot: false }, 'F': { type: 'grid', cell: 3, dot: true },
+            'G': { type: 'grid', cell: 4, dot: false }, 'H': { type: 'grid', cell: 4, dot: true },
+            'I': { type: 'grid', cell: 5, dot: false }, 'J': { type: 'grid', cell: 5, dot: true },
+            'K': { type: 'grid', cell: 6, dot: false }, 'L': { type: 'grid', cell: 6, dot: true },
+            'M': { type: 'grid', cell: 7, dot: false }, 'N': { type: 'grid', cell: 7, dot: true },
+            'O': { type: 'grid', cell: 8, dot: false }, 'P': { type: 'grid', cell: 8, dot: true },
+            'Q': { type: 'grid', cell: 9, dot: false }, 'R': { type: 'grid', cell: 9, dot: true },
+            'S': { type: 'diag', dir: 'top', dot: false }, 'T': { type: 'diag', dir: 'top', dot: true },
+            'U': { type: 'diag', dir: 'right', dot: false }, 'V': { type: 'diag', dir: 'right', dot: true },
+            'W': { type: 'diag', dir: 'bottom', dot: false }, 'X': { type: 'diag', dir: 'bottom', dot: true },
+            'Y': { type: 'diag', dir: 'left', dot: false }, 'Z': { type: 'diag', dir: 'left', dot: true }
+        };
+
+        const KOTAK2_MAP = {
+            'A': { type: 'grid', cell: 1, dot: 0 }, 'B': { type: 'grid', cell: 1, dot: 1 }, 'C': { type: 'grid', cell: 1, dot: 2 },
+            'D': { type: 'grid', cell: 2, dot: 0 }, 'E': { type: 'grid', cell: 2, dot: 1 }, 'F': { type: 'grid', cell: 2, dot: 2 },
+            'G': { type: 'grid', cell: 3, dot: 0 }, 'H': { type: 'grid', cell: 3, dot: 1 }, 'I': { type: 'grid', cell: 3, dot: 2 },
+            'J': { type: 'grid', cell: 4, dot: 0 }, 'K': { type: 'grid', cell: 4, dot: 1 }, 'L': { type: 'grid', cell: 4, dot: 2 },
+            'M': { type: 'grid', cell: 5, dot: 0 }, 'N': { type: 'grid', cell: 5, dot: 1 }, 'O': { type: 'grid', cell: 5, dot: 2 },
+            'P': { type: 'grid', cell: 6, dot: 0 }, 'Q': { type: 'grid', cell: 6, dot: 1 }, 'R': { type: 'grid', cell: 6, dot: 2 },
+            'S': { type: 'grid', cell: 7, dot: 0 }, 'T': { type: 'grid', cell: 7, dot: 1 }, 'U': { type: 'grid', cell: 7, dot: 2 },
+            'V': { type: 'grid', cell: 8, dot: 0 }, 'W': { type: 'grid', cell: 8, dot: 1 }, 'X': { type: 'grid', cell: 8, dot: 2 },
+            'Y': { type: 'grid', cell: 9, dot: 0 }, 'Z': { type: 'grid', cell: 9, dot: 1 }
+        };
+
+        const SEMAPHORE_MAP = {
+            'A': [180, 225], 'B': [180, 270], 'C': [180, 315], 'D': [180, 0],
+            'E': [180, 45], 'F': [180, 90], 'G': [180, 135], 'H': [225, 270],
+            'I': [225, 315], 'J': [0, 90], 'K': [225, 0], 'L': [225, 45],
+            'M': [225, 90], 'N': [225, 135], 'O': [270, 315], 'P': [270, 0],
+            'Q': [270, 45], 'R': [270, 90], 'S': [270, 135], 'T': [315, 0],
+            'U': [315, 45], 'V': [0, 90], 'W': [45, 90], 'X': [45, 135],
+            'Y': [315, 90], 'Z': [90, 135]
+        };
+
+        const SKU_PAGES = [
+            {
+                title: "1. Keagamaan & Rukun Agama",
+                sub: "Kecakapan Spiritual Penggalang Ramu",
+                content: "Dapat menyebutkan Rukun Iman dan Rukun Islam, serta dapat menghafal dan memimpin doa harian dalam pasukan Pramuka Penggalang."
+            },
+            {
+                title: "2. Patriotisme & Pancasila",
+                sub: "Kecakapan Kebangsaan",
+                content: "Dapat menyanyikan lagu kebangsaan Indonesia Raya, mengetahui arti lambang Negara Garuda Pancasila, dan mengamalkan Dasa Darma Pramuka."
+            },
+            {
+                title: "3. Tali Temali & Simpul",
+                sub: "Pionering Pramuka",
+                content: "Mampu membuat simpul mati, simpul jangkar, simpul pangkal, dan ikatan palang untuk keperluan pertolongan pertama serta menara pandang."
+            }
+        ];
+
+        function switchScreen(screenNum) {
+            currentScreen = screenNum;
+            document.querySelectorAll('.screen-view').forEach((sc, idx) => {
+                if (idx + 1 === screenNum) {
+                    sc.classList.remove('opacity-0', 'pointer-events-none');
+                    sc.classList.add('opacity-100', 'z-20');
+                } else {
+                    sc.classList.add('opacity-0', 'pointer-events-none');
+                    sc.classList.remove('opacity-100', 'z-20');
+                }
+            });
+
+            if (screenNum === 3) {
+                translateText();
+            } else if (screenNum === 4) {
+                renderSkuPage();
+                loadSkuStatus();
+            } else if (screenNum === 2) {
+                updateUserChip();
+            } else if (screenNum === 6) {
+                renderDashboard();
+            }
+        }
+
+        function selectMenuOption(opt) {
+            selectedMenuOption = opt;
+            ['sandi', 'sku', 'dash'].forEach(k => {
+                const on = k === opt;
+                const b = document.getElementById('box-' + k), g = document.getElementById('badge-' + k);
+                b.classList.toggle('border-amber-600', on);
+                b.classList.toggle('border-amber-900/20', !on);
+                b.classList.toggle('opacity-75', !on);
+                g.classList.toggle('opacity-0', !on);
+            });
+        }
+
+        function handleMenuNext() {
+            switchScreen({ sandi: 3, sku: 4, dash: 6 }[selectedMenuOption]);
+        }
+
+        function toggleTranslateDirection() {
+            const leftLabel = document.getElementById('modeLabelLeft');
+            const rightLabel = document.getElementById('modeLabelRight');
+            const icon = document.getElementById('directionIcon');
+            const inputHeading = document.getElementById('inputBoxHeading');
+
+            if (translateDirection === 'encode') {
+                translateDirection = 'decode';
+                leftLabel.innerText = "Sandi";
+                rightLabel.innerText = "Teks";
+                icon.className = "fa-solid fa-chevron-left text-amber-400 text-sm";
+                inputHeading.innerHTML = `<i class="fa-solid fa-key text-amber-700"></i><span>Masukkan Sandi</span>`;
+            } else {
+                translateDirection = 'encode';
+                leftLabel.innerText = "Teks";
+                rightLabel.innerText = "Sandi";
+                icon.className = "fa-solid fa-chevron-right text-amber-400 text-sm";
+                inputHeading.innerHTML = `<i class="fa-solid fa-pen-to-square text-amber-700"></i><span>Masukkan Teks</span>`;
+            }
+            translateText();
+        }
+
+        function translateText() {
+            const input = document.getElementById('translatorInput').value.trim();
+            const output = document.getElementById('translatorOutput');
+            const cipherType = document.getElementById('cipherTypeSelect').value;
+
+            if (!input) {
+                output.innerText = "...";
+                renderVisualCipher(cipherType, "");
+                return;
+            }
+
+            let result = "";
+            if (cipherType === 'morse') {
+                if (translateDirection === 'encode') {
+                    result = input.toUpperCase().split('').map(c => MORSE_MAP[c] || c).join(' ');
+                } else {
+                    result = input.split(' ').map(c => MORSE_REVERSE[c] || c).join('');
+                }
+            } else if (cipherType === 'rumput') {
+                if (translateDirection === 'encode') {
+                    const morse = input.toUpperCase().split('').map(c => MORSE_MAP[c] || c).join(' ');
+                    result = morse.split('').map(c => c === '.' ? 'v' : c === '-' ? 'W' : ' ').join('');
+                } else {
+                    const morse = input.split('').map(c => c === 'v' ? '.' : c === 'W' ? '-' : ' ').join('');
+                    result = morse.split(' ').map(c => MORSE_REVERSE[c] || c).join('');
+                }
+            } else if (cipherType === 'kotak1') {
+                result = translateDirection === 'encode' ? `[Kotak I] ${input.toUpperCase()}` : input.toUpperCase();
+            } else if (cipherType === 'kotak2') {
+                result = translateDirection === 'encode' ? `[Kotak II] ${input.toUpperCase()}` : input.toUpperCase();
+            } else if (cipherType === 'semaphore') {
+                result = translateDirection === 'encode' ? `[Semaphore] ${input.toUpperCase()}` : input.toUpperCase();
+            }
+
+            output.innerText = result;
+            renderVisualCipher(cipherType, input.toUpperCase());
+        }
+
+        function clearTranslatorInput() {
+            document.getElementById('translatorInput').value = '';
+            translateText();
+        }
+
+        function copyTranslationResult() {
+            const text = document.getElementById('translatorOutput').innerText;
+            if (!text || text === "...") return;
+            
+            const tempTextArea = document.createElement("textarea");
+            tempTextArea.value = text;
+            document.body.appendChild(tempTextArea);
+            tempTextArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempTextArea);
+
+            showToast("Hasil terjemah disalin!");
+        }
+
+        function playMorseAudioSignal() {
+            const text = document.getElementById('translatorOutput').innerText;
+            if (!text || text === "...") return;
+
+            try {
+                const AudioCtx = window.AudioContext || window.webkitAudioContext;
+                const ctx = new AudioCtx();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.type = 'sine';
+                osc.frequency.value = 750;
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+
+                osc.start();
+                gain.gain.setValueAtTime(0.3, ctx.currentTime);
+                setTimeout(() => {
+                    osc.stop();
+                }, 500);
+            } catch(e) {
+                showToast("Audio Morse dimainkan");
+            }
+        }
+
+        function playWhistleAudio() {
+            try {
+                const AudioCtx = window.AudioContext || window.webkitAudioContext;
+                const ctx = new AudioCtx();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.type = 'triangle';
+                osc.frequency.value = 2600;
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+
+                osc.start();
+                gain.gain.setValueAtTime(0.4, ctx.currentTime);
+                setTimeout(() => {
+                    osc.stop();
+                }, 350);
+            } catch(e) {
+                showToast("Peluit dibunyikan");
+            }
+        }
+
+        function triggerFlashSignal() {
+            const ind = document.getElementById('flashIndicator');
+            ind.classList.add('blinking');
+            showToast("Sinyal cahaya aktif");
+            setTimeout(() => {
+                ind.classList.remove('blinking');
+            }, 1400);
+        }
+
+        function renderVisualCipher(type, text) {
+            const tag = document.getElementById('visualCipherTag');
+            if (!text) text = "PRAMUKA";
+            const cleanText = text.toUpperCase().replace(/[^A-Z]/g, '').slice(0, 10);
+
+            if (type === 'kotak1') {
+                tag.innerText = "SANDI KOTAK I";
+                renderKotak1Visuals(cleanText);
+            } else if (type === 'kotak2') {
+                tag.innerText = "SANDI KOTAK II";
+                renderKotak2Visuals(cleanText);
+            } else if (type === 'rumput') {
+                tag.innerText = "SANDI RUMPUT";
+                document.getElementById('visualDrawingContainer').innerHTML = generateRumputVisualSvg(cleanText);
+            } else if (type === 'semaphore' || type === 'morse') {
+                tag.innerText = "SEMAPHORE";
+                document.getElementById('visualDrawingContainer').innerHTML = generateSemaphoreVisualSvg(cleanText[0] || 'S');
+            }
+        }
+
+        function renderKotak1Visuals(text) {
+            const container = document.getElementById('visualDrawingContainer');
+            container.innerHTML = '';
+            const clean = text.toUpperCase().replace(/[^A-Z]/g, '').slice(0, 10) || 'P';
+
+            clean.split('').forEach(char => {
+                const info = KOTAK1_MAP[char];
+                if (!info) return;
+
+                const wrapper = document.createElement('div');
+                wrapper.className = "flex flex-col items-center bg-scout-brownDark p-2 rounded-xl border border-amber-700 shadow";
+
+                let svgLines = "";
+                if (info.type === 'grid') {
+                    const c = info.cell;
+                    if ([1,2,3,4,5,6].includes(c)) svgLines += `<line x1="8" y1="8" x2="42" y2="8" stroke="#34d399" stroke-width="3"/>`;
+                    if ([4,5,6,7,8,9].includes(c)) svgLines += `<line x1="8" y1="42" x2="42" y2="42" stroke="#34d399" stroke-width="3"/>`;
+                    if ([2,3,5,6,8,9].includes(c)) svgLines += `<line x1="8" y1="8" x2="8" y2="42" stroke="#34d399" stroke-width="3"/>`;
+                    if ([1,2,4,5,7,8].includes(c)) svgLines += `<line x1="42" y1="8" x2="42" y2="42" stroke="#34d399" stroke-width="3"/>`;
+                } else {
+                    const d = info.dir;
+                    if (d === 'top') svgLines = `<polyline points="8,12 25,30 42,12" fill="none" stroke="#34d399" stroke-width="3"/>`;
+                    if (d === 'bottom') svgLines = `<polyline points="8,38 25,20 42,38" fill="none" stroke="#34d399" stroke-width="3"/>`;
+                    if (d === 'left') svgLines = `<polyline points="12,8 30,25 12,42" fill="none" stroke="#34d399" stroke-width="3"/>`;
+                    if (d === 'right') svgLines = `<polyline points="38,8 20,25 38,42" fill="none" stroke="#34d399" stroke-width="3"/>`;
+                }
+
+                const dot = info.dot ? `<circle cx="25" cy="25" r="3.5" fill="#fbbf24"/>` : '';
+
+                wrapper.innerHTML = `
+                    <svg width="50" height="50" viewBox="0 0 50 50" class="bg-black/60 rounded-lg border border-amber-900/40">
+                        ${svgLines}
+                        ${dot}
+                    </svg>
+                    <span class="text-[10px] font-bold text-amber-300 mt-1">${char}</span>
+                `;
+                container.appendChild(wrapper);
+            });
+        }
+
+        function renderKotak2Visuals(text) {
+            const container = document.getElementById('visualDrawingContainer');
+            container.innerHTML = '';
+            const clean = text.toUpperCase().replace(/[^A-Z]/g, '').slice(0, 10) || 'P';
+
+            clean.split('').forEach(char => {
+                const info = KOTAK2_MAP[char];
+                if (!info) return;
+
+                const wrapper = document.createElement('div');
+                wrapper.className = "flex flex-col items-center bg-scout-brownDark p-2 rounded-xl border border-amber-700 shadow";
+
+                let svgLines = "";
+                const c = info.cell;
+                if ([1,2,3,4,5,6].includes(c)) svgLines += `<line x1="8" y1="8" x2="42" y2="8" stroke="#60a5fa" stroke-width="3"/>`;
+                if ([4,5,6,7,8,9].includes(c)) svgLines += `<line x1="8" y1="42" x2="42" y2="42" stroke="#60a5fa" stroke-width="3"/>`;
+                if ([2,3,5,6,8,9].includes(c)) svgLines += `<line x1="8" y1="8" x2="8" y2="42" stroke="#60a5fa" stroke-width="3"/>`;
+                if ([1,2,4,5,7,8].includes(c)) svgLines += `<line x1="42" y1="8" x2="42" y2="42" stroke="#60a5fa" stroke-width="3"/>`;
+
+                let dots = '';
+                if (info.dot === 1) {
+                    dots = `<circle cx="25" cy="25" r="3" fill="#fbbf24"/>`;
+                } else if (info.dot === 2) {
+                    dots = `<circle cx="20" cy="25" r="2.5" fill="#fbbf24"/><circle cx="30" cy="25" r="2.5" fill="#fbbf24"/>`;
+                }
+
+                wrapper.innerHTML = `
+                    <svg width="50" height="50" viewBox="0 0 50 50" class="bg-black/60 rounded-lg border border-amber-900/40">
+                        ${svgLines}
+                        ${dots}
+                    </svg>
+                    <span class="text-[10px] font-bold text-amber-300 mt-1">${char}</span>
+                `;
+                container.appendChild(wrapper);
+            });
+        }
+
+        function generateRumputVisualSvg(text) {
+            let grassPaths = "";
+            let currentX = 10;
+
+            text.split('').forEach(char => {
+                const morse = MORSE_MAP[char] || '.';
+                morse.split('').forEach(symbol => {
+                    if (symbol === '.') {
+                        grassPaths += `<path d="M ${currentX} 45 L ${currentX + 5} 25 L ${currentX + 10} 45" stroke="#2D5A27" stroke-width="3" fill="none" stroke-linecap="round"/>`;
+                        currentX += 12;
+                    } else if (symbol === '-') {
+                        grassPaths += `<path d="M ${currentX} 45 L ${currentX + 8} 10 L ${currentX + 16} 45" stroke="#4ADE80" stroke-width="4" fill="none" stroke-linecap="round"/>`;
+                        currentX += 18;
+                    }
+                });
+                currentX += 8;
+            });
+
+            return `<svg width="${Math.max(currentX + 10, 200)}" height="55" viewBox="0 0 ${Math.max(currentX + 10, 200)} 55"><line x1="0" y1="45" x2="${Math.max(currentX + 10, 200)}" y2="45" stroke="#A06D3B" stroke-width="2"/>${grassPaths}</svg>`;
+        }
+
+        function generateSemaphoreVisualSvg(char) {
+            const angles = SEMAPHORE_MAP[char] || [180, 225];
+            const rad1 = (angles[0] - 90) * (Math.PI / 180);
+            const rad2 = (angles[1] - 90) * (Math.PI / 180);
+
+            const x1 = 60 + Math.cos(rad1) * 35;
+            const y1 = 55 + Math.sin(rad1) * 35;
+            const x2 = 60 + Math.cos(rad2) * 35;
+            const y2 = 55 + Math.sin(rad2) * 35;
+
+            return `
+                <div class="flex items-center space-x-3">
+                    <svg width="120" height="110" viewBox="0 0 120 110">
+                        <ellipse cx="60" cy="100" rx="25" ry="4" fill="#1e1005"/>
+                        <path d="M 48 20 Q 60 8 72 20 Z" fill="#5D3A1A"/>
+                        <circle cx="60" cy="28" r="10" fill="#F4E8C1"/>
+                        <polygon points="55,37 65,37 60,45" fill="#BC2C1A"/>
+                        <rect x="48" y="38" width="24" height="30" fill="#D4A373" rx="3"/>
+                        <line x1="60" y1="45" x2="${x1}" y2="${y1}" stroke="#5D3A1A" stroke-width="4" stroke-linecap="round"/>
+                        <circle cx="${x1}" cy="${y1}" r="6" fill="#BC2C1A"/>
+                        <line x1="60" y1="45" x2="${x2}" y2="${y2}" stroke="#5D3A1A" stroke-width="4" stroke-linecap="round"/>
+                        <circle cx="${x2}" cy="${y2}" r="6" fill="#FBBF24"/>
+                    </svg>
+                    <div class="text-left font-mono">
+                        <p class="text-lg font-black text-amber-400">HURUF: ${char}</p>
+                        <p class="text-[10px] text-amber-200/70">Sudut: ${angles[0]}° & ${angles[1]}°</p>
+                    </div>
+                </div>
+            `;
+        }
+
+        function changeSkuPage(dir) {
+            skuPageIndex = (skuPageIndex + dir + SKU_PAGES.length) % SKU_PAGES.length;
+            renderSkuPage();
+        }
+
+        function renderSkuPage() {
+            const page = SKU_PAGES[skuPageIndex];
+            document.getElementById('skuPageBadge').innerText = `Halaman ${skuPageIndex + 1} / ${SKU_PAGES.length}`;
+            document.getElementById('skuBookContent').innerHTML = `
+                <div class="text-center">
+                    <i class="fa-solid fa-award text-3xl text-amber-600 mb-1"></i>
+                    <h3 class="font-black text-sm text-scout-brownDark">${page.title}</h3>
+                    <p class="text-[11px] text-scout-brownLight font-semibold">${page.sub}</p>
+                </div>
+                <div class="bg-amber-100/90 p-3 rounded-xl border border-amber-800/20 text-[11px] text-slate-800 font-medium leading-relaxed shadow-sm">
+                    ${page.content}
+                </div>
+            `;
+            document.getElementById('skuBookContent').insertAdjacentHTML('beforeend', skuStatusHtml(skuPageIndex));
+        }
+
+        function openModal(id) {
+            document.getElementById(id).classList.remove('hidden');
+        }
+        function closeModal(id) {
+            document.getElementById(id).classList.add('hidden');
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('customToast');
+            document.getElementById('toastMessage').innerText = msg;
+            toast.classList.remove('hidden');
+            setTimeout(() => {
+                toast.classList.add('hidden');
+            }, 2000);
+        }
+
+
+        // ================= KONEKSI KE APPS SCRIPT =================
+        const LS_TOKEN = 'scoutify_token_v2';
+        const ROLE_LABEL = { admin: 'Admin', siswa: 'Siswa', pendamping: 'Pendamping / Kakak Dewan' };
+        const STATUS_UI = {
+            belum:    ['Belum ujian', 'bg-slate-500/30 text-slate-200'],
+            diajukan: ['Menunggu penilaian', 'bg-yellow-500/30 text-yellow-200'],
+            lulus:    ['Lulus', 'bg-emerald-500/30 text-emerald-200'],
+            tidak:    ['Belum lulus', 'bg-red-500/30 text-red-200']
+        };
+        let token = null, USER = null, DATA = { students: [], exams: [] }, USERS = [], busy = false;
+        try { token = localStorage.getItem(LS_TOKEN); } catch (e) {}
+
+        function saveToken(t) { token = t; try { t ? localStorage.setItem(LS_TOKEN, t) : localStorage.removeItem(LS_TOKEN); } catch (e) {} }
+
+        async function api(action, payload) {
+            if (!API_URL || API_URL.indexOf('PASTE_') === 0) throw new Error('URL Apps Script belum diisi di file HTML');
+            let res;
+            try {
+                // tanpa header Content-Type agar tidak kena CORS preflight
+                res = await fetch(API_URL, { method: 'POST', body: JSON.stringify(Object.assign({ action: action, token: token }, payload || {})) });
+            } catch (e) { throw new Error('Tidak bisa terhubung ke server'); }
+            let j;
+            try { j = await res.json(); } catch (e) { throw new Error('Respon server tidak valid (cek deployment Web App)'); }
+            if (!j.ok) {
+                if (/Sesi berakhir/.test(j.error)) { saveToken(null); USER = null; switchScreen(5); }
+                throw new Error(j.error);
+            }
+            return j.data;
+        }
+
+        async function act(fn, okMsg) {
+            if (busy) return;
+            busy = true;
+            try { await fn(); if (okMsg) showToast(okMsg); }
+            catch (e) { showToast('Gagal: ' + e.message); }
+            finally { busy = false; }
+        }
+
+        function esc(s) { return String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
+        function me() { return USER; }
+        function getExam(uid, i) { return DATA.exams.find(x => x.userId === uid && x.skuIndex === i) || { status: 'belum' }; }
+        async function refreshData() { DATA = await api('getData'); }
+
+        // ================= LOGIN =================
+        async function startApp() {
+            if (!token) { switchScreen(5); return; }
+            if (!USER) {
+                try { USER = await api('me'); }
+                catch (e) { showToast(e.message); switchScreen(5); return; }
+            }
+            switchScreen(2);
+        }
+
+        async function doLogin() {
+            if (busy) return;
+            const username = document.getElementById('loginUser').value.trim();
+            const password = document.getElementById('loginPass').value;
+            const err = document.getElementById('loginError');
+            const btn = document.getElementById('loginBtn');
+            if (!username || !password) { err.innerText = 'Isi username dan password.'; err.classList.remove('hidden'); return; }
+            busy = true; err.classList.add('hidden');
+            const old = btn.innerHTML;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1"></i> Memproses...';
+            try {
+                const r = await api('login', { username, password });
+                saveToken(r.token); USER = r.user;
+                document.getElementById('loginPass').value = '';
+                showToast('Selamat datang, ' + USER.name);
+                switchScreen(2);
+            } catch (e) {
+                err.innerText = e.message; err.classList.remove('hidden');
+            } finally { busy = false; btn.innerHTML = old; }
+        }
+
+        async function logout() {
+            try { if (token) await api('logout'); } catch (e) {}
+            saveToken(null); USER = null; DATA = { students: [], exams: [] }; USERS = [];
+            switchScreen(1);
+            showToast('Anda sudah keluar');
+        }
+
+        function updateUserChip() {
+            const u = USER; if (!u) return;
+            document.getElementById('chipName').innerText = u.name;
+            document.getElementById('chipRole').innerText = ROLE_LABEL[u.role];
+            const t = { siswa: ['Progres & Ujian SKU', 'Lihat progres SKU dan ajukan ujian'],
+                        pendamping: ['Penilaian Ujian', 'Beri ceklis lulus / tidak lulus siswa'],
+                        admin: ['Kelola User', 'Atur akun siswa, pendamping, dan admin'] }[u.role];
+            document.getElementById('dashTitle').innerText = t[0];
+            document.getElementById('dashDesc').innerText = t[1];
+        }
+
+        // ================= DASHBOARD =================
+        function badge(st) { return `<span class="text-[10px] font-bold px-2 py-0.5 rounded-full ${STATUS_UI[st][1]}">${STATUS_UI[st][0]}</span>`; }
+        function progressOf(uid) {
+            const done = SKU_PAGES.filter((_, i) => getExam(uid, i).status === 'lulus').length;
+            return { done, total: SKU_PAGES.length, pct: Math.round(done / SKU_PAGES.length * 100) };
+        }
+        function bar(p) {
+            return `<div class="w-full h-2 rounded-full bg-black/40 overflow-hidden"><div class="h-full bg-gradient-to-r from-amber-500 to-emerald-400" style="width:${p.pct}%"></div></div>`;
+        }
+        function headHtml() {
+            const u = USER;
+            return `<div class="flex items-center justify-between">
+                <div><p class="text-[10px] font-bold uppercase text-amber-300">${ROLE_LABEL[u.role]}</p><h2 class="text-xl font-black text-amber-100">${esc(u.name)}</h2></div>
+                <button onclick="logout()" class="px-3 py-1.5 rounded-xl bg-scout-scarlet text-white text-xs font-bold"><i class="fa-solid fa-right-from-bracket"></i> Keluar</button></div>`;
+        }
+
+        async function renderDashboard() {
+            if (!USER) { switchScreen(5); return; }
+            const el = document.getElementById('dashContent');
+            el.innerHTML = headHtml() + `<div class="text-center text-amber-200 text-xs py-10"><i class="fa-solid fa-spinner fa-spin text-2xl text-amber-400 mb-2"></i><p>Memuat data dari spreadsheet...</p></div>`;
+            try {
+                await refreshData();
+                if (USER.role === 'admin') USERS = await api('listUsers');
+                drawDashboard();
+            } catch (e) {
+                el.innerHTML = headHtml() + `<div class="glass-panel rounded-2xl p-4 text-center text-xs text-amber-100 space-y-3"><p class="text-red-300 font-bold">${esc(e.message)}</p><button onclick="renderDashboard()" class="px-4 py-2 rounded-xl bg-amber-500 text-scout-brownDark font-extrabold text-xs">Coba Lagi</button></div>`;
+            }
+        }
+
+        function drawDashboard() {
+            const u = USER; if (!u) return;
+            const body = u.role === 'siswa' ? dashSiswa(u) : u.role === 'pendamping' ? dashPendamping(u) : dashAdmin(u);
+            document.getElementById('dashContent').innerHTML = headHtml() + body;
+        }
+
+        // ---- Siswa ----
+        function dashSiswa(u) {
+            const p = progressOf(u.id);
+            let h = `<div class="glass-panel rounded-2xl p-3 space-y-2 text-amber-100">
+                <div class="flex justify-between text-xs font-bold"><span>Progres SKU</span><span class="text-amber-300">${p.done}/${p.total} lulus (${p.pct}%)</span></div>${bar(p)}</div>`;
+            SKU_PAGES.forEach((pg, i) => {
+                const e = getExam(u.id, i);
+                const can = e.status === 'belum' || e.status === 'tidak';
+                h += `<div class="glass-card-light rounded-2xl p-3 space-y-2">
+                    <div class="flex items-start justify-between gap-2"><div><h4 class="text-xs font-black text-scout-brownDark">${esc(pg.title)}</h4><p class="text-[10px] text-scout-brownLight">${esc(pg.sub)}</p></div>${badge(e.status)}</div>
+                    ${e.by ? `<p class="text-[10px] text-slate-600">Dinilai oleh ${esc(e.by)} &middot; ${esc(e.date)}</p>` : ''}
+                    ${can ? `<button onclick="ajukanUjian(${i})" class="w-full py-2 rounded-xl bg-scout-brown text-amber-200 text-xs font-bold active:scale-95"><i class="fa-solid fa-paper-plane mr-1"></i>${e.status === 'tidak' ? 'Ajukan Ujian Ulang' : 'Ajukan Ujian'}</button>` : ''}
+                </div>`;
+            });
+            return h;
+        }
+
+        function ajukanUjian(i) {
+            if (!USER || USER.role !== 'siswa') return;
+            act(async () => {
+                await api('ajukan', { skuIndex: i });
+                await refreshData();
+                if (currentScreen === 4) renderSkuPage(); else drawDashboard();
+            }, 'Ujian berhasil diajukan');
+        }
+
+        function loadSkuStatus() {
+            if (USER && USER.role === 'siswa') refreshData().then(() => { if (currentScreen === 4) renderSkuPage(); }).catch(() => {});
+        }
+
+        function skuStatusHtml(i) {
+            const u = USER;
+            if (!u || u.role !== 'siswa') return '';
+            const e = getExam(u.id, i);
+            const can = e.status === 'belum' || e.status === 'tidak';
+            const stCls = { belum: 'bg-slate-200 text-slate-700', diajukan: 'bg-yellow-200 text-yellow-800', lulus: 'bg-emerald-200 text-emerald-800', tidak: 'bg-red-200 text-red-800' }[e.status];
+            return `<div class="flex items-center justify-between gap-2 pt-1">
+                <span class="text-[10px] font-bold px-2 py-1 rounded-full ${stCls}">${STATUS_UI[e.status][0]}</span>
+                ${can ? `<button onclick="ajukanUjian(${i})" class="px-3 py-1.5 rounded-lg bg-scout-brown text-amber-200 text-[10px] font-bold active:scale-95">Ajukan Ujian</button>` : ''}</div>`;
+        }
+
+        // ---- Pendamping / Kakak Dewan ----
+        function dashPendamping(u) {
+            const students = DATA.students;
+            const rows = [];
+            students.forEach(s => SKU_PAGES.forEach((pg, i) => { const e = getExam(s.id, i); if (e.status !== 'belum') rows.push({ s, i, pg, e }); }));
+            const pending = rows.filter(r => r.e.status === 'diajukan');
+            const history = rows.filter(r => r.e.status !== 'diajukan');
+            let h = `<div class="glass-panel rounded-2xl p-3 text-xs text-amber-100 flex items-center justify-between"><span><i class="fa-solid fa-clipboard-check text-amber-400 mr-1"></i> Menunggu penilaian: <strong class="text-amber-300">${pending.length}</strong></span><button onclick="renderDashboard()" class="text-amber-300"><i class="fa-solid fa-rotate"></i></button></div>`;
+            h += `<h3 class="text-xs font-bold text-amber-300 pt-1">Ujian Diajukan</h3>`;
+            h += pending.length ? pending.map(r => `<div class="glass-card-light rounded-2xl p-3 space-y-2">
+                    <div><h4 class="text-xs font-black text-scout-brownDark">${esc(r.s.name)}</h4><p class="text-[10px] text-scout-brownLight">${esc(r.pg.title)} &middot; diajukan ${esc(r.e.date)}</p></div>
+                    <div class="grid grid-cols-2 gap-2">
+                        <button onclick="nilaiUjian('${r.s.id}',${r.i},'lulus')" class="py-2 rounded-xl bg-scout-forest text-white text-xs font-bold active:scale-95"><i class="fa-solid fa-check mr-1"></i>Lulus</button>
+                        <button onclick="nilaiUjian('${r.s.id}',${r.i},'tidak')" class="py-2 rounded-xl bg-scout-scarlet text-white text-xs font-bold active:scale-95"><i class="fa-solid fa-xmark mr-1"></i>Tidak Lulus</button>
+                    </div></div>`).join('') : `<p class="text-[11px] text-amber-200/70 italic">Belum ada ujian yang diajukan.</p>`;
+            h += `<h3 class="text-xs font-bold text-amber-300 pt-2">Progres Siswa</h3>`;
+            h += students.map(s => { const p = progressOf(s.id); return `<div class="glass-panel rounded-xl p-2.5 space-y-1.5 text-amber-100"><div class="flex justify-between text-[11px] font-bold"><span>${esc(s.name)}</span><span class="text-amber-300">${p.done}/${p.total}</span></div>${bar(p)}</div>`; }).join('') || `<p class="text-[11px] text-amber-200/70 italic">Belum ada siswa.</p>`;
+            h += `<h3 class="text-xs font-bold text-amber-300 pt-2">Riwayat Penilaian</h3>`;
+            h += history.length ? history.map(r => `<div class="glass-panel rounded-xl p-2.5 flex items-center justify-between gap-2 text-amber-100">
+                    <div class="min-w-0"><p class="text-[11px] font-bold truncate">${esc(r.s.name)}</p><p class="text-[10px] text-amber-200/70 truncate">${esc(r.pg.title)}</p></div>
+                    <div class="flex items-center gap-1.5 shrink-0">${badge(r.e.status)}
+                    <button title="Ubah penilaian" onclick="nilaiUjian('${r.s.id}',${r.i},'${r.e.status === 'lulus' ? 'tidak' : 'lulus'}')" class="w-7 h-7 rounded-lg bg-scout-brown text-amber-300 text-[10px]"><i class="fa-solid fa-rotate"></i></button></div></div>`).join('') : `<p class="text-[11px] text-amber-200/70 italic">Belum ada riwayat.</p>`;
+            return h;
+        }
+
+        function nilaiUjian(uid, i, status) {
+            if (!USER || USER.role !== 'pendamping') return;
+            act(async () => {
+                await api('nilai', { userId: uid, skuIndex: i, status });
+                await refreshData();
+                drawDashboard();
+            }, status === 'lulus' ? 'Ditandai LULUS' : 'Ditandai TIDAK LULUS');
+        }
+
+        // ---- Admin ----
+        function dashAdmin(u) {
+            const cnt = r => USERS.filter(x => x.role === r).length;
+            let h = `<div class="grid grid-cols-3 gap-2 text-center text-amber-100">
+                ${['siswa', 'pendamping', 'admin'].map(r => `<div class="glass-panel rounded-xl p-2"><p class="text-lg font-black text-amber-300">${cnt(r)}</p><p class="text-[9px] uppercase">${r}</p></div>`).join('')}</div>
+                <button onclick="openUserModal()" class="w-full py-2.5 rounded-xl bg-amber-500 text-scout-brownDark font-extrabold text-xs active:scale-95"><i class="fa-solid fa-user-plus mr-1"></i>Tambah User</button>`;
+            h += USERS.map(x => `<div class="glass-card-light rounded-2xl p-3 flex items-center justify-between gap-2">
+                    <div class="min-w-0"><p class="text-xs font-black text-scout-brownDark truncate">${esc(x.name)}</p><p class="text-[10px] text-scout-brownLight truncate">@${esc(x.username)} &middot; ${ROLE_LABEL[x.role]}</p></div>
+                    <div class="flex gap-1.5 shrink-0">
+                        <button onclick="openUserModal('${x.id}')" class="w-8 h-8 rounded-lg bg-scout-brown text-amber-300 text-xs"><i class="fa-solid fa-pen"></i></button>
+                        ${x.id === u.id ? '' : `<button onclick="deleteUser('${x.id}')" class="w-8 h-8 rounded-lg bg-scout-scarlet text-white text-xs"><i class="fa-solid fa-trash"></i></button>`}
+                    </div></div>`).join('');
+            return h;
+        }
+
+        function openUserModal(id) {
+            const x = id ? USERS.find(v => v.id === id) : null;
+            document.getElementById('umTitle').innerText = x ? 'Edit User' : 'Tambah User';
+            document.getElementById('umId').value = x ? x.id : '';
+            document.getElementById('umName').value = x ? x.name : '';
+            document.getElementById('umUser').value = x ? x.username : '';
+            document.getElementById('umPass').value = '';
+            document.getElementById('umPass').placeholder = x ? 'Password baru (kosongkan jika tidak diubah)' : 'Password (min. 6 karakter)';
+            document.getElementById('umRole').value = x ? x.role : 'siswa';
+            document.getElementById('umError').classList.add('hidden');
+            openModal('userModal');
+        }
+
+        async function saveUser() {
+            if (busy) return;
+            const err = document.getElementById('umError');
+            const payload = {
+                id: document.getElementById('umId').value,
+                name: document.getElementById('umName').value.trim(),
+                username: document.getElementById('umUser').value.trim(),
+                password: document.getElementById('umPass').value,
+                role: document.getElementById('umRole').value
+            };
+            busy = true; err.classList.add('hidden');
+            try {
+                await api('saveUser', payload);
+                if (payload.id && payload.id === USER.id) USER = await api('me');
+                USERS = await api('listUsers');
+                closeModal('userModal'); showToast('User disimpan'); drawDashboard();
+            } catch (e) {
+                err.innerText = e.message; err.classList.remove('hidden');
+            } finally { busy = false; }
+        }
+
+        function deleteUser(id) {
+            const x = USERS.find(v => v.id === id);
+            if (!x || !confirm('Hapus user "' + x.name + '"? Data ujiannya ikut terhapus.')) return;
+            act(async () => {
+                await api('deleteUser', { id });
+                USERS = await api('listUsers');
+                drawDashboard();
+            }, 'User dihapus');
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            switchScreen(1);
+            selectMenuOption('sandi');
+        });
+    </script>
+</body>
+</html>
